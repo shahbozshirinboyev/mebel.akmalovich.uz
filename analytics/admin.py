@@ -1,9 +1,10 @@
 from django.contrib import admin
 from .models import FinancialPerformanceIndicator
+from core.admin_mixins import PreserveFiltersAdminMixin
 
 
 @admin.register(FinancialPerformanceIndicator)
-class FinancialPerformanceIndicatorAdmin(admin.ModelAdmin):
+class FinancialPerformanceIndicatorAdmin(PreserveFiltersAdminMixin, admin.ModelAdmin):
     list_display = (
         'id',
         'year',

@@ -1,9 +1,10 @@
 from django.contrib import admin
 from .models import IncomeExpense, IncomeExpenseStatistics
+from core.admin_mixins import PreserveFiltersAdminMixin
 
 
 @admin.register(IncomeExpense)
-class IncomeExpenseAdmin(admin.ModelAdmin):
+class IncomeExpenseAdmin(PreserveFiltersAdminMixin, admin.ModelAdmin):
     list_display = (
         'id',
         'date',
@@ -46,7 +47,7 @@ class IncomeExpenseAdmin(admin.ModelAdmin):
 
 
 @admin.register(IncomeExpenseStatistics)
-class IncomeExpenseStatisticsAdmin(admin.ModelAdmin):
+class IncomeExpenseStatisticsAdmin(PreserveFiltersAdminMixin, admin.ModelAdmin):
     list_display = (
         'id',
         'year',

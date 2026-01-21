@@ -5,6 +5,7 @@ from django.utils.html import format_html
 from .models import Employee, Balance, BalanceStatistics
 from .forms import EmployeeAdminForm
 from datetime import datetime
+from core.admin_mixins import PreserveFiltersAdminMixin
 
 
 class YearFilter(admin.SimpleListFilter):
@@ -57,7 +58,7 @@ class MonthFilter(admin.SimpleListFilter):
 
 
 @admin.register(Employee)
-class EmployeeAdmin(admin.ModelAdmin):
+class EmployeeAdmin(PreserveFiltersAdminMixin, admin.ModelAdmin):
     form = EmployeeAdminForm
 
     list_display = (
@@ -95,7 +96,7 @@ class EmployeeAdmin(admin.ModelAdmin):
 
 
 @admin.register(Balance)
-class BalanceAdmin(admin.ModelAdmin):
+class BalanceAdmin(PreserveFiltersAdminMixin, admin.ModelAdmin):
     list_display = (
         # 'id',
         'formatted_date',
@@ -160,7 +161,7 @@ class BalanceAdmin(admin.ModelAdmin):
 
 
 @admin.register(BalanceStatistics)
-class BalanceStatisticsAdmin(admin.ModelAdmin):
+class BalanceStatisticsAdmin(PreserveFiltersAdminMixin, admin.ModelAdmin):
     list_display = (
         'id',
         'employee',

@@ -1,12 +1,13 @@
 from django.contrib import admin
 from django.contrib.auth.models import Group
 from .models import User
-
+from core.admin_mixins import PreserveFiltersAdminMixin
 
 admin.site.unregister(Group)
 
 @admin.register(User)
-class UserAdmin(admin.ModelAdmin):
+class UserAdmin(PreserveFiltersAdminMixin, admin.ModelAdmin):
+
     list_display = (
         'id',
         'username',
