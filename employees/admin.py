@@ -1,18 +1,24 @@
 from django.contrib import admin
 from .models import Employee, Balance, BalanceStatistics
+from .forms import EmployeeAdminForm
 
 
 @admin.register(Employee)
 class EmployeeAdmin(admin.ModelAdmin):
+    form = EmployeeAdminForm
+
     list_display = (
         'id',
+        'user',
         'full_name',
         'position',
         'salary_type',
         'base_salary',
-        'user',
         'created_at'
     )
+
+    class Media:
+        js = ('admin/js/employee_autofill.js',)
     list_filter = (
         'salary_type',
         'position',
@@ -26,15 +32,11 @@ class EmployeeAdmin(admin.ModelAdmin):
     )
     readonly_fields = ('created_at',)
     fieldsets = (
-        ('Asosiy ma\'lumotlar', {
+        ('Основная информация', {
             'fields': ('user', 'full_name', 'position')
         }),
-        ('Maosh ma\'lumotlari', {
+        ('Информация о зарплате', {
             'fields': ('salary_type', 'base_salary')
-        }),
-        ('Vaqt belgilari', {
-            'fields': ('created_at',),
-            'classes': ('collapse',)
         }),
     )
 

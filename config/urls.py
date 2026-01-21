@@ -19,9 +19,11 @@ from django.urls import path
 from django.conf import settings
 from django.conf.urls.static import static
 from accounts.views import home
+from employees.views import get_user_full_name
 
 urlpatterns = [
     path('', home, name='home'),
+    path('admin/get-user-full-name/', get_user_full_name, name='get_user_full_name'),
     path('admin/', admin.site.urls),
 ]
 if settings.DEBUG:

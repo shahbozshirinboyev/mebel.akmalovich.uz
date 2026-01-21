@@ -5,9 +5,9 @@ from accounts.models import User
 class Employee(models.Model):
     """Сотрудники model"""
     SALARY_TYPES = [
-        ('fixed', 'Belgilangan'),
-        ('hourly', 'Soatbay'),
-        ('piecework', 'Ish hajmi bo\'yicha'),
+        ('fixed', 'Фиксированная'),
+        ('hourly', 'Почасовая'),
+        ('piecework', 'Сдельная'),
     ]
 
     user = models.ForeignKey(
@@ -18,28 +18,28 @@ class Employee(models.Model):
     )
     full_name = models.CharField(
         max_length=200,
-        verbose_name='To\'liq ism',
+        verbose_name='Полное имя',
         blank=True
     )
     position = models.CharField(
         max_length=100,
-        verbose_name='Lavozim'
+        verbose_name='Позиция'
     )
     salary_type = models.CharField(
         max_length=50,
         choices=SALARY_TYPES,
         default='fixed',
-        verbose_name='Maosh turi'
+        verbose_name='Вид зарплаты'
     )
     base_salary = models.DecimalField(
         max_digits=12,
         decimal_places=2,
         default=0,
-        verbose_name='Asosiy maosh'
+        verbose_name='Базовая зарплата'
     )
     created_at = models.DateTimeField(
         auto_now_add=True,
-        verbose_name='Yaratilgan vaqt'
+        verbose_name='Создано'
     )
 
     def save(self, *args, **kwargs):
