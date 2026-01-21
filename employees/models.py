@@ -99,6 +99,7 @@ class Balance(models.Model):
         verbose_name = '2. Баланс'
         verbose_name_plural = '2. Балансы'
         ordering = ['-date', '-created_at']
+        unique_together = ('employee', 'date')
 
     def __str__(self):
         return f"{self.employee.full_name} - {self.date}"
