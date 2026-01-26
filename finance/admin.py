@@ -1,19 +1,31 @@
 from django.contrib import admin
 from .models import IncomeExpense, IncomeExpenseStatistics
-from core.admin_mixins import PreserveFiltersAdminMixin
+from core.admin_mixins import PreserveFiltersAdminMixin, LocalizedAmountAdminMixin, format_amount
 
 
 @admin.register(IncomeExpense)
-class IncomeExpenseAdmin(PreserveFiltersAdminMixin, admin.ModelAdmin):
+class IncomeExpenseAdmin(LocalizedAmountAdminMixin, PreserveFiltersAdminMixin, admin.ModelAdmin):
     list_display = (
         'id',
         'date',
-        'income_amount',
-        'expense_amount',
-        'get_net_profit',
+        'formatted_income_amount',
+        'formatted_expense_amount',
+        'formatted_net_profit',
         'created_by',
         'created_at'
     )
+
+    def formatted_income_amount(self, obj):
+        return format_amount(obj.income_amount)
+    formatted_income_amount.short_description = 'Kirim summasi'
+
+    def formatted_expense_amount(self, obj):
+        return format_amount(obj.expense_amount)
+    formatted_expense_amount.short_description = 'Chiqim summasi'
+
+    def formatted_net_profit(self, obj):
+        return format_amount(obj.net_profit)
+    formatted_net_profit.short_description = 'Foyda'
     list_filter = (
         'date',
         'created_by',
@@ -47,14 +59,14 @@ class IncomeExpenseAdmin(PreserveFiltersAdminMixin, admin.ModelAdmin):
 
 
 @admin.register(IncomeExpenseStatistics)
-class IncomeExpenseStatisticsAdmin(PreserveFiltersAdminMixin, admin.ModelAdmin):
+class IncomeExpenseStatisticsAdmin(LocalizedAmountAdminMixin, PreserveFiltersAdminMixin, admin.ModelAdmin):
     list_display = (
         'id',
         'year',
         'month',
-        'total_income',
-        'total_expense',
-        'net_profit'
+        'formatted_total_income',
+        'formatted_total_expense',
+        'formatted_net_profit'
     )
     list_filter = (
         'year',
@@ -69,3 +81,15 @@ class IncomeExpenseStatisticsAdmin(PreserveFiltersAdminMixin, admin.ModelAdmin):
             'fields': ('total_income', 'total_expense', 'net_profit')
         }),
     )
+
+    def formatted_total_income(self, obj):
+        return format_amount(obj.total_income)
+    formatted_total_income.short_description = 'Jami kirim'
+
+    def formatted_total_expense(self, obj):
+        return format_amount(obj.total_expense)
+    formatted_total_expense.short_description = 'Jami chiqim'
+
+    def formatted_net_profit(self, obj):
+        return format_amount(obj.net_profit)
+    formatted_net_profit.short_description = 'Foyda'

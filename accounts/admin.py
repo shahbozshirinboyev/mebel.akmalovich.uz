@@ -13,7 +13,7 @@ class UserAdmin(PreserveFiltersAdminMixin, admin.ModelAdmin):
         'username',
         'first_name',
         'last_name',
-        # 'phone_number',
+        'phone_number',
         'is_superuser', # super foydalanuvchi huquqi
         'is_active',    # faollik holati
         'is_staff',     # admin panelga kirish huquqi

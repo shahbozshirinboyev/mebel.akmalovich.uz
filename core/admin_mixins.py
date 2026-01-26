@@ -1,6 +1,39 @@
+from django import forms
 from django.contrib import admin
+from django.contrib.humanize.templatetags.humanize import intcomma
+from django.db import models
 from django.http import HttpResponseRedirect
 from urllib.parse import urlparse, urlencode
+
+
+def format_amount(value):
+    if value is None:
+        return "-"
+    return intcomma(value)
+
+
+class LocalizedAmountAdminMixin:
+    formfield_overrides = {
+        models.DecimalField: {'localize': True},
+    }
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        if obj is None:
+            for field in form.base_fields.values():
+                if isinstance(field, forms.DecimalField) or hasattr(field, 'decimal_places'):
+                    field.initial = None
+                    field.required = False
+                    field.empty_value = 0
+        return form
+
+    def save_model(self, request, obj, form, change):
+        for field in obj._meta.fields:
+            if isinstance(field, models.DecimalField):
+                value = getattr(obj, field.name)
+                if value is None or value == '':
+                    setattr(obj, field.name, 0)
+        super().save_model(request, obj, form, change)
 
 class PreserveFiltersAdminMixin:
     """

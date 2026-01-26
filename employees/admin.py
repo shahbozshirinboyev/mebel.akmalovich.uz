@@ -3,7 +3,7 @@ from django.utils.translation import gettext_lazy as _
 from django.urls import reverse
 from django.utils.html import format_html
 from datetime import datetime
-from core.admin_mixins import PreserveFiltersAdminMixin
+from core.admin_mixins import PreserveFiltersAdminMixin, LocalizedAmountAdminMixin, format_amount
 from .models import Employee, Balance, MonthBalanceStatistics, YearlyBalanceStatistics
 from .forms import EmployeeAdminForm
 
@@ -107,7 +107,7 @@ class StatisticsMonthFilter(admin.SimpleListFilter):
 
 
 @admin.register(Employee)
-class EmployeeAdmin(PreserveFiltersAdminMixin, admin.ModelAdmin):
+class EmployeeAdmin(LocalizedAmountAdminMixin, PreserveFiltersAdminMixin, admin.ModelAdmin):
     form = EmployeeAdminForm
 
     list_display = (
@@ -116,7 +116,7 @@ class EmployeeAdmin(PreserveFiltersAdminMixin, admin.ModelAdmin):
         'full_name',
         'position',
         'salary_type',
-        'base_salary',
+        'formatted_base_salary',
         'created_at'
     )
 
@@ -143,17 +143,24 @@ class EmployeeAdmin(PreserveFiltersAdminMixin, admin.ModelAdmin):
         }),
     )
 
+    def formatted_base_salary(self, obj):
+        return format_amount(obj.base_salary)
+    formatted_base_salary.short_description = 'Базовая зарплата'
+
 
 @admin.register(Balance)
-class BalanceAdmin(PreserveFiltersAdminMixin, admin.ModelAdmin):
+class BalanceAdmin(LocalizedAmountAdminMixin, PreserveFiltersAdminMixin, admin.ModelAdmin):
+    class Media:
+        js = ('admin/js/format_thousands.js',)
+
     list_display = (
         # 'id',
         'formatted_date',
         'employee',
-        'earned_amount',
-        'paid_amount',
+        'formatted_earned_amount',
+        'formatted_paid_amount',
         'description',
-        'net_balance',
+        'formatted_net_balance',
         'created_at',
         'actions_column'
     )
@@ -174,6 +181,18 @@ class BalanceAdmin(PreserveFiltersAdminMixin, admin.ModelAdmin):
         """Format date as year, month"""
         return obj.date.strftime('%d.%m.%Y')
     formatted_date.short_description = 'Sana'
+
+    def formatted_earned_amount(self, obj):
+        return format_amount(obj.earned_amount)
+    formatted_earned_amount.short_description = 'Topilgan summa'
+
+    def formatted_paid_amount(self, obj):
+        return format_amount(obj.paid_amount)
+    formatted_paid_amount.short_description = 'To\'langan summa'
+
+    def formatted_net_balance(self, obj):
+        return format_amount(obj.net_balance)
+    formatted_net_balance.short_description = 'Qolgan balans'
 
     def actions_column(self, obj):
         """Display edit icon that links to the change form"""
@@ -210,7 +229,7 @@ class BalanceAdmin(PreserveFiltersAdminMixin, admin.ModelAdmin):
 
 
 @admin.register(MonthBalanceStatistics)
-class MonthBalanceStatisticsAdmin(PreserveFiltersAdminMixin, admin.ModelAdmin):
+class MonthBalanceStatisticsAdmin(LocalizedAmountAdminMixin, PreserveFiltersAdminMixin, admin.ModelAdmin):
     # Faqat ko'rish uchun, qo'lda kiritish mumkin emas
     def has_add_permission(self, request):
         return False
@@ -224,9 +243,9 @@ class MonthBalanceStatisticsAdmin(PreserveFiltersAdminMixin, admin.ModelAdmin):
     list_display = (
         'formatted_month',
         'employee',
-        'total_earned',
-        'total_paid',
-        'net_balance'
+        'formatted_total_earned',
+        'formatted_total_paid',
+        'formatted_net_balance'
     )
 
     def formatted_month(self, obj):
@@ -238,6 +257,18 @@ class MonthBalanceStatisticsAdmin(PreserveFiltersAdminMixin, admin.ModelAdmin):
         }
         return month_names.get(obj.month, f'Oy {obj.month}')
     formatted_month.short_description = 'Sana (faqat oy)'
+
+    def formatted_total_earned(self, obj):
+        return format_amount(obj.total_earned)
+    formatted_total_earned.short_description = 'Jami topilgan'
+
+    def formatted_total_paid(self, obj):
+        return format_amount(obj.total_paid)
+    formatted_total_paid.short_description = 'Jami to\'langan'
+
+    def formatted_net_balance(self, obj):
+        return format_amount(obj.net_balance)
+    formatted_net_balance.short_description = 'Oy bo\'yicha qoldig\'i'
     list_filter = (
         StatisticsYearFilter,
         'employee'
@@ -274,9 +305,9 @@ class MonthBalanceStatisticsAdmin(PreserveFiltersAdminMixin, admin.ModelAdmin):
             messages.info(
                 request,
                 f"{year_filter}-yil uchun barcha 12 oy ma'lumotlari. "
-                f"Jami topilgan: {yearly_data['total_earned'] or 0}, "
-                f"Jami to'langan: {yearly_data['total_paid'] or 0}, "
-                f"Jami balans: {yearly_data['total_balance'] or 0}"
+                f"Jami topilgan: {format_amount(yearly_data['total_earned'] or 0)}, "
+                f"Jami to'langan: {format_amount(yearly_data['total_paid'] or 0)}, "
+                f"Jami balans: {format_amount(yearly_data['total_balance'] or 0)}"
             )
 
         return response
@@ -307,7 +338,7 @@ class MonthBalanceStatisticsAdmin(PreserveFiltersAdminMixin, admin.ModelAdmin):
 
 
 @admin.register(YearlyBalanceStatistics)
-class YearlyBalanceStatisticsAdmin(PreserveFiltersAdminMixin, admin.ModelAdmin):
+class YearlyBalanceStatisticsAdmin(LocalizedAmountAdminMixin, PreserveFiltersAdminMixin, admin.ModelAdmin):
     # Faqat ko'rish uchun, qo'lda kiritish mumkin emas
     def has_add_permission(self, request):
         return False
@@ -321,9 +352,9 @@ class YearlyBalanceStatisticsAdmin(PreserveFiltersAdminMixin, admin.ModelAdmin):
     list_display = (
         'year',
         'employee',
-        'total_earned',
-        'total_paid',
-        'net_balance'
+        'formatted_total_earned',
+        'formatted_total_paid',
+        'formatted_net_balance'
     )
     list_filter = (
         'employee',
@@ -333,6 +364,18 @@ class YearlyBalanceStatisticsAdmin(PreserveFiltersAdminMixin, admin.ModelAdmin):
         'employee__position'
     )
     readonly_fields = ('total_earned', 'total_paid', 'net_balance')
+
+    def formatted_total_earned(self, obj):
+        return format_amount(obj.total_earned)
+    formatted_total_earned.short_description = 'Yil bo\'yicha jami topilgan'
+
+    def formatted_total_paid(self, obj):
+        return format_amount(obj.total_paid)
+    formatted_total_paid.short_description = 'Yil bo\'yicha jami to\'langan'
+
+    def formatted_net_balance(self, obj):
+        return format_amount(obj.net_balance)
+    formatted_net_balance.short_description = 'Yil bo\'yicha qoldig\'i'
 
     def changelist_view(self, request, extra_context=None):
         # Call parent changelist_view first
