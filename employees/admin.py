@@ -2,10 +2,10 @@ from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 from django.urls import reverse
 from django.utils.html import format_html
-from .models import Employee, Balance, BalanceStatistics
-from .forms import EmployeeAdminForm
 from datetime import datetime
 from core.admin_mixins import PreserveFiltersAdminMixin
+from .models import Employee, Balance, MonthBalanceStatistics, YearlyBalanceStatistics
+from .forms import EmployeeAdminForm
 
 
 class YearFilter(admin.SimpleListFilter):
@@ -209,8 +209,8 @@ class BalanceAdmin(PreserveFiltersAdminMixin, admin.ModelAdmin):
     )
 
 
-@admin.register(BalanceStatistics)
-class BalanceStatisticsAdmin(PreserveFiltersAdminMixin, admin.ModelAdmin):
+@admin.register(MonthBalanceStatistics)
+class MonthBalanceStatisticsAdmin(PreserveFiltersAdminMixin, admin.ModelAdmin):
     # Faqat ko'rish uchun, qo'lda kiritish mumkin emas
     def has_add_permission(self, request):
         return False
@@ -262,7 +262,7 @@ class BalanceStatisticsAdmin(PreserveFiltersAdminMixin, admin.ModelAdmin):
             from django.db.models import Sum, Q
 
             # Calculate yearly totals
-            yearly_data = BalanceStatistics.objects.filter(
+            yearly_data = MonthBalanceStatistics.objects.filter(
                 year=year_filter,
                 employee_id=employee_filter
             ).aggregate(
@@ -303,7 +303,52 @@ class BalanceStatisticsAdmin(PreserveFiltersAdminMixin, admin.ModelAdmin):
         ('Statistika ma\'lumotlari', {
             'fields': ('total_earned', 'total_paid', 'net_balance')
         }),
-        ('Holat', {
-            'fields': ('is_closed',)
+    )
+
+
+@admin.register(YearlyBalanceStatistics)
+class YearlyBalanceStatisticsAdmin(PreserveFiltersAdminMixin, admin.ModelAdmin):
+    # Faqat ko'rish uchun, qo'lda kiritish mumkin emas
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    list_display = (
+        'year',
+        'employee',
+        'total_earned',
+        'total_paid',
+        'net_balance'
+    )
+    list_filter = (
+        'employee',
+    )
+    search_fields = (
+        'employee__full_name',
+        'employee__position'
+    )
+    readonly_fields = ('total_earned', 'total_paid', 'net_balance')
+
+    def changelist_view(self, request, extra_context=None):
+        # Call parent changelist_view first
+        response = super().changelist_view(request, extra_context)
+
+        return response
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs
+
+    fieldsets = (
+        ('Asosiy ma\'lumotlar', {
+            'fields': ('employee',)
+        }),
+        ('Statistika ma\'lumotlari', {
+            'fields': ('total_earned', 'total_paid', 'net_balance')
         }),
     )

@@ -111,12 +111,12 @@ class Balance(models.Model):
         return self.earned_amount - self.paid_amount
 
 
-class BalanceStatistics(models.Model):
-    """Xodimlar balans statistikasi modeli (Статистика Баланс)"""
+class MonthBalanceStatistics(models.Model):
+    """Xodimlar oylik balans statistikasi modeli (Статистика Баланса)"""
     employee = models.ForeignKey(
         Employee,
         on_delete=models.CASCADE,
-        related_name='balance_statistics',
+        related_name='month_balance_statistics',
         verbose_name='Xodim'
     )
     year = models.IntegerField(
@@ -151,8 +151,8 @@ class BalanceStatistics(models.Model):
     )
 
     class Meta:
-        verbose_name = '3. Статистика баланса'
-        verbose_name_plural = '3. Статистика баланса'
+        verbose_name = '3. Статистика за месяц'
+        verbose_name_plural = '3. Статистика за месяц'
         unique_together = ['employee', 'year', 'month']
         ordering = ['-year', '-month']
 
@@ -175,16 +175,97 @@ class BalanceStatistics(models.Model):
         total_paid = balances.aggregate(total=Sum('paid_amount'))['total'] or 0
         net_balance = total_earned - total_paid
 
-        # Statistikani yangilash yoki yaratish
-        statistics, created = cls.objects.update_or_create(
+        # Avval eski yozuvni o'chirish
+        cls.objects.filter(
             employee=employee,
             year=year,
-            month=month,
-            defaults={
-                'total_earned': total_earned,
-                'total_paid': total_paid,
-                'net_balance': net_balance,
-            }
+            month=month
+        ).delete()
+
+        # Faqat ma'lumot bor bo'lsa yangi statistikani yaratish
+        if total_earned > 0 or total_paid > 0:
+            statistics = cls.objects.create(
+                employee=employee,
+                year=year,
+                month=month,
+                total_earned=total_earned,
+                total_paid=total_paid,
+                net_balance=net_balance,
+            )
+            return statistics
+
+        return None
+
+
+class YearlyBalanceStatistics(models.Model):
+    """Xodimlar yillik balans statistikasi modeli"""
+    employee = models.ForeignKey(
+        Employee,
+        on_delete=models.CASCADE,
+        related_name='yearly_balance_statistics',
+        verbose_name='Xodim'
+    )
+    year = models.IntegerField(
+        verbose_name='Yil'
+    )
+    total_earned = models.DecimalField(
+        max_digits=15,
+        decimal_places=2,
+        default=0,
+        verbose_name='Yil bo\'yicha jami topilgan'
+    )
+    total_paid = models.DecimalField(
+        max_digits=15,
+        decimal_places=2,
+        default=0,
+        verbose_name='Yil bo\'yicha jami to\'langan'
+    )
+    net_balance = models.DecimalField(
+        max_digits=15,
+        decimal_places=2,
+        default=0,
+        verbose_name='Yil bo\'yicha qoldig\'i'
+    )
+
+    class Meta:
+        verbose_name = '4. Статистика за год'
+        verbose_name_plural = '4. Статистика за год'
+        unique_together = ['employee', 'year']
+        ordering = ['-year', 'employee__full_name']
+
+    def __str__(self):
+        return f"{self.employee.full_name} - {self.year} (Yillik)"
+
+    @classmethod
+    def update_yearly_statistics(cls, employee, year):
+        """Balance modelidan yillik statistikani yangilash"""
+        from django.db.models import Sum
+
+        # Yil uchun Balance yozuvlarini hisoblash
+        balances = Balance.objects.filter(
+            employee=employee,
+            date__year=year
         )
 
-        return statistics
+        total_earned = balances.aggregate(total=Sum('earned_amount'))['total'] or 0
+        total_paid = balances.aggregate(total=Sum('paid_amount'))['total'] or 0
+        net_balance = total_earned - total_paid
+
+        # Avval eski yozuvni o'chirish
+        cls.objects.filter(
+            employee=employee,
+            year=year
+        ).delete()
+
+        # Faqat ma'lumot bor bo'lsa yangi statistikani yaratish
+        if total_earned > 0 or total_paid > 0:
+            statistics = cls.objects.create(
+                employee=employee,
+                year=year,
+                total_earned=total_earned,
+                total_paid=total_paid,
+                net_balance=net_balance,
+            )
+            return statistics
+
+        return None
