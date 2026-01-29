@@ -10,47 +10,40 @@ admin.site.unregister(Group)
 @admin.register(User)
 class UserAdmin(PreserveFiltersAdminMixin, admin.ModelAdmin):
 
-    def superuser_col(self, obj):
-        return obj.is_superuser
-    superuser_col.short_description = 'Суперпользователь'
-    superuser_col.boolean = True
-
-    def formatted_date_joined(self, obj):
-        return format_html('<span style="font-size: 12px;">{}</span>', obj.date_joined.strftime('%d.%m.%Y, %H:%M'))
-
-    def formatted_last_login(self, obj):
-        if obj.last_login:
-            return format_html('<span style="font-size: 12px;">{}</span>', obj.last_login.strftime('%d.%m.%Y, %H:%M'))
-        else:
-            return format_html('<span style="font-size: 12px;">{}</span>', '-')
-
-    def username_col(self, obj):
-        return obj.username
-    username_col.short_description = 'Пользователь'
-
-    formatted_date_joined.short_description = 'Дата регистрации'
-    formatted_last_login.short_description = 'Последний вход'
-
     list_display = (
         'id',
-        'username_col',
+        'username',
         'first_name',
         'last_name',
         'phone_number',
-        'superuser_col', # super foydalanuvchi huquqi
-        'is_active',    # faollik holati
-        'is_staff',     # admin panelga kirish huquqi
+        'is_superuser',
+        'is_active',
+        'is_staff',
         'is_worker',
         'is_manager',
-        'formatted_date_joined',
-        'formatted_last_login',
+        'date_joined',
+        'last_login',
     )
-    def is_superuser_short(self, obj):
-        return obj.is_superuser
-    is_superuser_short.short_description = 'Суперпользователь'
-    is_superuser_short.boolean = True
-    search_fields = ('username', 'email', 'phone_number')
+    search_fields = ('username', 'first_name', 'last_name', 'phone_number')
     list_filter = ()
+
+    # Hide these fields from the add/edit forms
+    exclude = ('last_login', 'groups', 'email', 'date_joined')
+
+    # Display fields without sections
+    fields = (
+        'username',
+        'password',
+        'first_name', 
+        'last_name',
+        'phone_number',
+        'is_active',
+        'is_staff',
+        'is_superuser',
+        'is_worker',
+        'is_manager',
+        'user_permissions',
+    )
 
     class Media:
         css = {

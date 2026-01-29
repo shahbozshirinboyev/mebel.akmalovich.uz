@@ -7,29 +7,29 @@ class User(AbstractUser):
         max_length=20,
         blank=True,
         null=True,
-        verbose_name="Телефон"
+        verbose_name="Phone number"
     )
 
     profile_picture = models.ImageField(
         upload_to='profiles/',
         blank=True,
         null=True,
-        verbose_name="Фото профиля"
+        verbose_name="Image"
     )
 
     is_worker = models.BooleanField(
-    default=False,
-    verbose_name="Сотрудник"
-)
+        default=False,
+        verbose_name="Worker"
+    )
 
     is_manager = models.BooleanField(
         default=False,
-        verbose_name="Менеджер"
+        verbose_name="Manager"
     )
 
     def __str__(self):
         return self.username
 
     class Meta:
-        verbose_name = "Пользователь"
-        verbose_name_plural = "Пользователи"
+        verbose_name = "User"
+        verbose_name_plural = "Users"
