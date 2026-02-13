@@ -12,7 +12,7 @@ class Employee(models.Model):
 	phone_number = models.CharField(max_length=20, blank=True, null=True)
 	position = models.CharField(max_length=100, blank=True)
 	salary_type = models.CharField(max_length=50, blank=True)
-	base_salary = models.IntegerField(default=0)
+	base_salary = models.DecimalField(max_digits=15, decimal_places=2, blank=True, null=True)
 	created_at = models.DateTimeField(auto_now_add=True)
 
 	class Meta:
@@ -26,9 +26,9 @@ class Salary(models.Model):
 	id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 	employee = models.ForeignKey("Employee", on_delete=models.CASCADE, related_name="salaries")
 	date = models.DateField()
-	earned_amount = models.IntegerField(default=0)
+	earned_amount = models.DecimalField(max_digits=15, decimal_places=2, blank=True, null=True)
 	earned_note = models.TextField(blank=True, null=True)
-	paid_amount = models.IntegerField(default=0)
+	paid_amount = models.DecimalField(max_digits=15, decimal_places=2, blank=True, null=True)
 	paid_note = models.TextField(blank=True, null=True)
 	created_at = models.DateTimeField(auto_now_add=True)
 
