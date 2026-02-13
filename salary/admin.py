@@ -10,6 +10,7 @@ User = get_user_model()
 @admin.register(Employee)
 class EmployeeAdmin(admin.ModelAdmin):
 	list_display = ("full_name", "user", "phone_number", "position", "salary_type", "base_salary")
+	list_filter = ()
 	search_fields = ()
 
 	class Media:
@@ -52,6 +53,6 @@ class EmployeeAdmin(admin.ModelAdmin):
 
 @admin.register(Salary)
 class SalaryAdmin(admin.ModelAdmin):
-	list_display = ("employee", "date", "earned_amount", "paid_amount")
-	list_filter = ("date",)
-	search_fields = ("full_name_position",)
+	list_display = ("employee", "date", "earned_amount", "earned_note", "paid_amount", "paid_note", "created_at")
+	list_filter = ()
+	search_fields = ()

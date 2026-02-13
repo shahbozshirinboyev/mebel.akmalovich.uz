@@ -11,6 +11,8 @@ admin.site.unregister(Group)
 class UserAdmin(DjangoUserAdmin):
     # Ko'rsatiladigan ustunlar
     list_display = ('id', 'username', 'first_name', 'last_name', 'phone_number', 'is_worker', 'is_staff', 'is_active', 'is_superuser', 'last_login', 'date_joined')
+    list_filter = ()
+    search_fields = ()
 
     # Edit (change) sahifadagi inputlar ketma-ketligi
     fieldsets = (
@@ -27,5 +29,5 @@ class UserAdmin(DjangoUserAdmin):
             'fields': ('first_name', 'last_name', 'username', 'password1', 'password2', 'phone_number', 'is_worker', 'is_staff', 'is_active', 'user_permissions'),
         }),
     )
-    
+
     list_filter = ()

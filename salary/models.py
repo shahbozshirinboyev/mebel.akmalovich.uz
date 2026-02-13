@@ -19,15 +19,12 @@ class Employee(models.Model):
 		ordering = ["created_at"]
 
 	def __str__(self):
-		return f"{self.full_name}"
+		return f"{self.full_name} - {self.position}"
 
 
 class Salary(models.Model):
 	id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-	employee = models.ForeignKey(
-		"Employee", on_delete=models.CASCADE, related_name="salaries"
-	)
-	full_name_position = models.CharField(max_length=255, blank=True)
+	employee = models.ForeignKey("Employee", on_delete=models.CASCADE, related_name="salaries")
 	date = models.DateField()
 	earned_amount = models.IntegerField(default=0)
 	earned_note = models.TextField(blank=True, null=True)
