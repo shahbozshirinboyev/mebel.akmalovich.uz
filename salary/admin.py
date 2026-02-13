@@ -9,7 +9,7 @@ User = get_user_model()
 
 @admin.register(Employee)
 class EmployeeAdmin(admin.ModelAdmin):
-	list_display = ("full_name", "user", "phone_number", "position", "salary_type", "f_base_salary")
+	list_display = ("full_name", "user", "phone_number", "position", "salary_type", "f_base_salary", "created_at")
 	list_filter = ()
 	search_fields = ()
 
