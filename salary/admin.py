@@ -15,12 +15,28 @@ class EmployeeAdmin(admin.ModelAdmin):
 	class Media:
 		js = ("admin/js/user_autofill.js",)
 
+	def clean_user(self, form_data):
+		"""Validate that user is not already assigned to another employee."""
+		cleaned_data = form_data
+		if 'user' in cleaned_data:
+			user = cleaned_data['user']
+			if user and Employee.objects.filter(user=user).exclude(id=self.instance.id if self.instance else None).exists():
+				raise admin.ValidationError("Bu foydalanuvchi allaqachon xodim sifatida belgilangan.")
+		return cleaned_data
+
 	def get_urls(self):
 		urls = super().get_urls()
 		custom_urls = [
 			path('get-user-details/<uuid:user_id>/', self.admin_site.admin_view(self.get_user_details), name='employee_get_user_details'),
 		]
 		return custom_urls + urls
+
+	def save_model(self, request, obj, form, change):
+		"""Validate before saving that this user isn't already assigned."""
+		if obj.user and Employee.objects.filter(user=obj.user).exclude(id=obj.id).exists():
+			from django.core.exceptions import ValidationError
+			raise ValidationError("Bu foydalanuvchi allaqachon xodim sifatida belgilangan.")
+		super().save_model(request, obj, form, change)
 
 	def get_user_details(self, request, user_id):
 		try:
