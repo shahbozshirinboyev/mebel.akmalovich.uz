@@ -34,6 +34,7 @@ class Salary(models.Model):
 
 	class Meta:
 		ordering = ["-date", "-created_at"]
+		unique_together = ("employee", "date")
 
 	def __str__(self):
 		return f"Salary({self.employee}, {self.date})"

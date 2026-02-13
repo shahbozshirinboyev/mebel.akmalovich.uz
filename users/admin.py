@@ -29,5 +29,3 @@ class UserAdmin(DjangoUserAdmin):
             'fields': ('first_name', 'last_name', 'username', 'password1', 'password2', 'phone_number', 'is_worker', 'is_staff', 'is_active', 'user_permissions'),
         }),
     )
-
-    list_filter = ()
