@@ -2,6 +2,8 @@ from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.http import JsonResponse
 from django.urls import path
+from django.forms import TextInput
+from django.db import models as dj_models
 from .models import Employee, Salary
 
 User = get_user_model()
@@ -13,8 +15,12 @@ class EmployeeAdmin(admin.ModelAdmin):
 	list_filter = ()
 	search_fields = ()
 
+	formfield_overrides = {
+		dj_models.DecimalField: {'widget': TextInput(attrs={'class': 'thousand-sep'})},
+	}
+
 	class Media:
-		js = ("admin/js/user_autofill.js",)
+		js = ("admin/js/user_autofill.js", "salary/js/decimal_thousands.js",)
 
 	def clean_user(self, form_data):
 		"""Validate that user is not already assigned to another employee."""
@@ -56,3 +62,10 @@ class SalaryAdmin(admin.ModelAdmin):
 	list_display = ("employee", "date", "earned_amount", "earned_note", "paid_amount", "paid_note", "created_at")
 	list_filter = ()
 	search_fields = ()
+
+	formfield_overrides = {
+		dj_models.DecimalField: {'widget': TextInput(attrs={'class': 'thousand-sep'})},
+	}
+
+	class Media:
+		js = ("salary/js/decimal_thousands.js",)
