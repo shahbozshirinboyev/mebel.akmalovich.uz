@@ -7,13 +7,13 @@ class SaleItemInline(admin.TabularInline):
 	model = SaleItem
 	extra = 1
 	fields = ("product", "quantity", "price", "total", "buyer")
-	readonly_fields = ("total",)
+	# readonly_fields = ("total",)
 
 @admin.register(Sale)
 class SaleAdmin(admin.ModelAdmin):
       list_display = ("date", "created_by", "total_price", "description", "created_at")
       inlines = (SaleItemInline,)
-      readonly_fields = ("total_price",)
+    #   readonly_fields = ("total_price",)
 
       class Media:
             js = ('sales/js/calculate_total.js',)
@@ -31,7 +31,7 @@ class SaleAdmin(admin.ModelAdmin):
       # total_price hisoblash
       def total_price(self, obj):
           total = obj.sotuvlar.aggregate(
-              sum=models.Sum( models.ExpressionWrapper( models.F("soni") * models.F("narxi"), output_field=models.DecimalField() ) ) )["sum"]
+              sum=models.Sum( models.ExpressionWrapper( models.F("quantity") * models.F("price"), output_field=models.DecimalField() ) ) )["sum"]
           if total is None:
               return "0.00"
           return f"{total:.2f}"
@@ -42,7 +42,10 @@ class SaleAdmin(admin.ModelAdmin):
 @admin.register(SaleItem)
 class SaleItemAdmin(admin.ModelAdmin):
 	list_display = ("product", "quantity", "price", "total", "buyer", "sale", "created_at" )
-	readonly_fields = ("total",)
+	# readonly_fields = ("total",)
+
+	class Media:
+		js = ('sales/js/calculate_total.js',)
 
 
 @admin.register(Product)
