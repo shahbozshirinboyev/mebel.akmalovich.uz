@@ -1,12 +1,11 @@
 from django.contrib import admin
-from django.utils.html import format_html
 from django.db import models
 from .models import Buyer, Product, Sale, SaleItem
 
 
 class SaleItemInline(admin.TabularInline):
 	model = SaleItem
-	extra = 0
+	extra = 1
 	fields = ("product", "quantity", "price", "total", "buyer")
 	readonly_fields = ("total",)
 
