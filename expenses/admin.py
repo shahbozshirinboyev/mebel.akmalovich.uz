@@ -5,12 +5,12 @@ from .models import FoodProducts, RawMaterials, Expenses, FoodItem, RawItem
 @admin.register(FoodProducts)
 class FoodProductsAdmin(admin.ModelAdmin):
     list_display = ('food_product_name', 'measurement_unit', 'created_at')
-    search_fields = ('food_product_name',)
+    # search_fields = ('food_product_name',)
 
 @admin.register(RawMaterials)
 class RawMaterialsAdmin(admin.ModelAdmin):
     list_display = ('raw_material_name', 'measurement_unit', 'created_at')
-    search_fields = ('raw_material_name',)
+    # search_fields = ('raw_material_name',)
 
 @admin.register(FoodItem)
 class FoodItemAdmin(admin.ModelAdmin):
@@ -46,9 +46,9 @@ class RawItemInline(admin.TabularInline):
 
 @admin.register(Expenses)
 class ExpensesAdmin(admin.ModelAdmin):
-    list_display = ('date', 'total_cost', 'created_by', 'created_at')
-    list_filter = ('date', 'created_by')
-    search_fields = ('description',)
+    list_display = ('date', 'created_by', 'total_cost', 'description', 'created_at')
+    # list_filter = ('date', 'created_by')
+    # search_fields = ('description',)
     inlines = [FoodItemInline, RawItemInline]
 
     # total_cost modelda editable=False bo'lgani uchun readonly_fields'ga qo'shish kerak
