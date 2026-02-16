@@ -52,7 +52,8 @@ class ExpensesAdmin(admin.ModelAdmin):
     inlines = [FoodItemInline, RawItemInline]
 
     # total_cost modelda editable=False bo'lgani uchun readonly_fields'ga qo'shish kerak
-    readonly_fields = ('total_cost',)
+    readonly_fields = ('total_cost', 'created_by')
+    exclude = ('created_by',)
 
     def save_formset(self, request, form, formset, change):
         """
