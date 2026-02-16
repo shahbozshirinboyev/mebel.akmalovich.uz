@@ -1,8 +1,8 @@
 (function($) {
     $(document).ready(function() {
-        function calculateTotal(row) {
-            var quantity = parseFloat($(row).find('input[name*="quantity"]').val()) || 0;
-            var price = parseFloat($(row).find('input[name*="price"]').val()) || 0;
+        function calculateTotal() {
+            var quantity = parseFloat($('input[name="quantity"]').val()) || 0;
+            var price = parseFloat($('input[name="price"]').val()) || 0;
             var total = quantity * price;
 
             // Format with thousand separator
@@ -11,54 +11,43 @@
                 maximumFractionDigits: 2
             });
 
-            // Update the total display - try both span and td
-            var totalDisplay = $(row).find('.total-item-price-display');
-            if (totalDisplay.length === 0) {
-                totalDisplay = $(row).find('td.field-total_item_price_display');
-            }
-            totalDisplay.text(formattedTotal);
-        }
+            console.log('Calculating:', quantity, 'x', price, '=', total);
 
-        // Function to add calculation to all rows
-        function setupCalculationForAllRows() {
+            // Update all possible total displays
+            $('.total-item-price-display').text(formattedTotal);
+            $('.field-total_item_price .readonly').text(formattedTotal);
+            $('#id_total_item_price').closest('.form-row').find('.readonly').text(formattedTotal);
+
+            // For inline forms
             $('.inline-group tr').each(function() {
                 var row = this;
-
-                // Only process rows that have quantity and price inputs
-                if ($(row).find('input[name*="quantity"], input[name*="price"]').length > 0) {
-                    // Setup event listeners
-                    $(row).find('input[name*="quantity"], input[name*="price"]').on('input change', function() {
-                        calculateTotal(row);
-                    });
-
-                    // Initial calculation
-                    calculateTotal(row);
-                }
+                var qty = parseFloat($(row).find('input[name*="quantity"]').val()) || 0;
+                var prc = parseFloat($(row).find('input[name*="price"]').val()) || 0;
+                var rowTotal = qty * prc;
+                var formattedRowTotal = rowTotal.toLocaleString('en-US', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+                $(row).find('.total-item-price-display').text(formattedRowTotal);
+                $(row).find('td.field-total_item_price_display').text(formattedRowTotal);
             });
         }
 
-        // Initial setup
-        setupCalculationForAllRows();
-
-        // Handle Django's inline form additions
-        $(document).on('formset:added', function(event, row, formsetName) {
-            setTimeout(function() {
-                setupCalculationForAllRows();
-            }, 100);
+        // Setup event listeners
+        $(document).on('input change', 'input[name*="quantity"], input[name*="price"]', function() {
+            calculateTotal();
         });
 
-        // Alternative for Django inline additions
+        // Initial calculation
+        calculateTotal();
+
+        // Handle inline additions
         $('.add-row a').click(function() {
-            setTimeout(function() {
-                setupCalculationForAllRows();
-            }, 100);
+            setTimeout(calculateTotal, 100);
         });
 
-        // Also handle tabular inline additions
-        $('.inline-group').on('click', '.add-row a', function() {
-            setTimeout(function() {
-                setupCalculationForAllRows();
-            }, 100);
+        $(document).on('formset:added', function() {
+            setTimeout(calculateTotal, 100);
         });
     });
 })(django.jQuery || jQuery);

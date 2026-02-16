@@ -15,10 +15,18 @@ class RawMaterialsAdmin(admin.ModelAdmin):
 @admin.register(FoodItem)
 class FoodItemAdmin(admin.ModelAdmin):
 	list_display = ("food_product", "quantity", "price", "total_item_price", "expense", "created_at" )
+	readonly_fields = ("total_item_price",)
+
+	class Media:
+		js = ('expenses/js/calculate_total.js',)
 
 @admin.register(RawItem)
 class RawItemAdmin(admin.ModelAdmin):
 	list_display = ("raw_material", "quantity", "price", "total_item_price", "expense", "created_at" )
+	readonly_fields = ("total_item_price",)
+
+	class Media:
+		js = ('expenses/js/calculate_total.js',)
 
 # --- Inlines: Expenses ichida ko'rinadigan qismlar ---
 
