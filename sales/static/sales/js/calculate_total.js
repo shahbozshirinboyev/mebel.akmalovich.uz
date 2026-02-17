@@ -15,6 +15,12 @@ document.addEventListener('DOMContentLoaded', function() {
         allTotalInputs.forEach(input => {
             input.readOnly = true;
         });
+
+        // Sale formdagi total_price maydoni
+        const totalPriceField = document.querySelector('#id_total_price, input[name="total_price"]');
+        if (totalPriceField) {
+            totalPriceField.readOnly = true;
+        }
     }
 
     makeAllTotalFieldsReadonly();
@@ -47,6 +53,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const totalPriceField = document.querySelector('#id_total_price, input[name="total_price"]');
         if (totalPriceField) {
             totalPriceField.value = grandTotal.toFixed(2);
+            totalPriceField.readOnly = true; // Make it readonly
             // Trigger formatting for the total price field
             totalPriceField.dispatchEvent(new Event('input'));
             console.log('Total price updated:', grandTotal.toFixed(2));
