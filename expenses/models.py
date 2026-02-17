@@ -41,7 +41,7 @@ class Expenses(models.Model):
     # ManyToMany olib tashlandi, chunki bog'liqlik
     # FoodItem va RawItem modellaridagi ForeignKey orqali boshqariladi.
 
-    total_cost = models.DecimalField(max_digits=12, decimal_places=2, default=0, editable=False)
+    total_cost = models.DecimalField(max_digits=20, decimal_places=2, default=0, editable=False)
     description = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -73,8 +73,8 @@ class FoodItem(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     expense = models.ForeignKey(Expenses, on_delete=models.CASCADE, related_name="food_items")
     food_product = models.ForeignKey(FoodProducts, on_delete=models.CASCADE)
-    quantity = models.DecimalField(max_digits=12, decimal_places=2, default=0)
-    price = models.DecimalField(max_digits=15, decimal_places=2, default=0) # Narx majburiy bo'lgani ma'qul
+    quantity = models.DecimalField(max_digits=20, decimal_places=2, default=0)
+    price = models.DecimalField(max_digits=20, decimal_places=2, default=0) # Narx majburiy bo'lgani ma'qul
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -93,8 +93,8 @@ class RawItem(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     expense = models.ForeignKey(Expenses, on_delete=models.CASCADE, related_name="raw_items")
     raw_material = models.ForeignKey(RawMaterials, on_delete=models.CASCADE)
-    quantity = models.DecimalField(max_digits=12, decimal_places=2, default=0)
-    price = models.DecimalField(max_digits=15, decimal_places=2, default=0)
+    quantity = models.DecimalField(max_digits=20, decimal_places=2, default=0)
+    price = models.DecimalField(max_digits=20, decimal_places=2, default=0)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

@@ -39,7 +39,7 @@ class Sale(models.Model):
 	created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
 	date = models.DateField(unique=True)
 	description = models.TextField(blank=True)
-	total_price = models.DecimalField(max_digits=15, decimal_places=2, blank=True, null=True)
+	total_price = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
 	created_at = models.DateTimeField(auto_now_add=True)
 
 	class Meta:
@@ -67,9 +67,9 @@ class SaleItem(models.Model):
 	id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 	sale = models.ForeignKey(Sale, on_delete=models.CASCADE, related_name="sotuvlar")
 	product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="sale_items")
-	quantity = models.DecimalField(max_digits=12, decimal_places=2, default=0)
-	price = models.DecimalField(max_digits=15, decimal_places=2, blank=True, null=True)
-	total = models.DecimalField(max_digits=15, decimal_places=2, blank=True, null=True, default=0)
+	quantity = models.DecimalField(max_digits=20, decimal_places=2, default=0)
+	price = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
+	total = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True, default=0)
 	buyer = models.ForeignKey(Buyer, on_delete=models.SET_NULL, null=True, blank=True)
 	created_at = models.DateTimeField(auto_now_add=True)
 
