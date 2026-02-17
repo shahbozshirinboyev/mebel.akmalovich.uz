@@ -57,6 +57,14 @@ class Expenses(models.Model):
         self.total_cost = food_sum + raw_sum
         self.save()
 
+    @property
+    def food_items_total(self):
+        return sum(item.total_item_price for item in self.food_items.all())
+
+    @property
+    def raw_items_total(self):
+        return sum(item.total_item_price for item in self.raw_items.all())
+
     def __str__(self):
         return f"Expense - {self.date}"
 

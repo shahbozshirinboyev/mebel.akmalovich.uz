@@ -1,38 +1,48 @@
 (function($) {
     $(document).ready(function() {
         function calculateTotal() {
-            var quantity = parseFloat($('input[name="quantity"]').val()) || 0;
-            var price = parseFloat($('input[name="price"]').val()) || 0;
-            var total = quantity * price;
+            var foodTotal = 0;
+            var rawTotal = 0;
 
-            // Format with thousand separator
-            var formattedTotal = total.toLocaleString('en-US', {
+            // Calculate for each inline group
+            $('.inline-group').each(function(index, group) {
+                var groupTotal = 0;
+                $(group).find('tr').each(function() {
+                    var row = this;
+                    var qty = parseFloat($(row).find('input[name*="quantity"]').val()) || 0;
+                    var prc = parseFloat($(row).find('input[name*="price"]').val()) || 0;
+                    var rowTotal = qty * prc;
+                    groupTotal += rowTotal;
+                    var formattedRowTotal = rowTotal.toLocaleString('en-US', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
+                    $(row).find('.total-item-price-display').text(formattedRowTotal);
+                    $(row).find('td.field-total_item_price_display').text(formattedRowTotal);
+                });
+
+                if (index === 0) {
+                    foodTotal = groupTotal;
+                } else if (index === 1) {
+                    rawTotal = groupTotal;
+                }
+            });
+
+            var overallTotal = foodTotal + rawTotal;
+
+            // Update food total
+            var formattedFoodTotal = foodTotal.toLocaleString('en-US', {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2
             });
+            $('.field-food_items_total .readonly').text(formattedFoodTotal);
 
-            console.log('Calculating:', quantity, 'x', price, '=', total);
-
-            // Update all possible total displays
-            $('.total-item-price-display').text(formattedTotal);
-            $('.field-total_item_price .readonly').text(formattedTotal);
-            $('#id_total_item_price').closest('.form-row').find('.readonly').text(formattedTotal);
-
-            // For inline forms
-            var overallTotal = 0;
-            $('.inline-group tr').each(function() {
-                var row = this;
-                var qty = parseFloat($(row).find('input[name*="quantity"]').val()) || 0;
-                var prc = parseFloat($(row).find('input[name*="price"]').val()) || 0;
-                var rowTotal = qty * prc;
-                overallTotal += rowTotal;
-                var formattedRowTotal = rowTotal.toLocaleString('en-US', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                });
-                $(row).find('.total-item-price-display').text(formattedRowTotal);
-                $(row).find('td.field-total_item_price_display').text(formattedRowTotal);
+            // Update raw total
+            var formattedRawTotal = rawTotal.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
             });
+            $('.field-raw_items_total .readonly').text(formattedRawTotal);
 
             // Update overall total cost
             var formattedOverallTotal = overallTotal.toLocaleString('en-US', {

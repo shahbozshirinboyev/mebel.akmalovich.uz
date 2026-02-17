@@ -66,7 +66,7 @@ class ExpensesAdmin(admin.ModelAdmin):
     inlines = [FoodItemInline, RawItemInline]
 
     # total_cost modelda editable=False bo'lgani uchun readonly_fields'ga qo'shish kerak
-    readonly_fields = ('total_cost',)
+    readonly_fields = ('food_items_total', 'raw_items_total', 'total_cost')
     exclude = ('created_by',)
 
     class Media:
