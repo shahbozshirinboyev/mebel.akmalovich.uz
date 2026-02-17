@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.db import models
 from django.core.exceptions import ValidationError
+from django.utils.formats import number_format
 import uuid
 
 # FoodProducts va RawMaterials alohida qolmoqda
@@ -82,7 +83,8 @@ class FoodItem(models.Model):
 
     @property
     def total_item_price(self):
-        return self.quantity * self.price
+        total = self.quantity * self.price
+        return number_format(total, decimal_pos=2)
 
     def __str__(self):
         return f"{self.food_product.food_product_name} - {self.quantity}"
@@ -101,7 +103,8 @@ class RawItem(models.Model):
 
     @property
     def total_item_price(self):
-        return self.quantity * self.price
+        total = self.quantity * self.price
+        return number_format(total, decimal_pos=2)
 
     def __str__(self):
         return f"{self.raw_material.raw_material_name} - {self.quantity}"
