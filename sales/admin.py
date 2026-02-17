@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.db import models
-from django.forms import TextInput
+from django.forms import TextInput, Textarea
 from django.db import models as dj_models
 from .models import Buyer, Product, Sale, SaleItem
 
@@ -23,6 +23,7 @@ class SaleAdmin(admin.ModelAdmin):
 
       formfield_overrides = {
 		dj_models.DecimalField: {'widget': TextInput(attrs={'class': 'thousand-sep'})},
+        dj_models.TextField: {'widget': Textarea(attrs={'cols': 100, 'rows': 5})},
 	  }
 
       class Media:
