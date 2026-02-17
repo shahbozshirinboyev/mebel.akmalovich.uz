@@ -7,7 +7,7 @@ from .models import Buyer, Product, Sale, SaleItem
 
 class SaleItemInline(admin.TabularInline):
 	model = SaleItem
-	extra = 1
+	extra = 0
 	fields = ("product", "quantity", "price", "total", "buyer")
 	# readonly_fields = ("total",)
 

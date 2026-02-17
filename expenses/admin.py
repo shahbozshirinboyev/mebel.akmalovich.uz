@@ -43,7 +43,7 @@ class RawItemAdmin(admin.ModelAdmin):
 
 class FoodItemInline(admin.TabularInline):
     model = FoodItem
-    extra = 1  # Bo'sh qatorlar soni
+    extra = 0  # Bo'sh qatorlar soni
     fields = ('food_product', 'quantity', 'price', 'total_item_price_display')
     readonly_fields = ('total_item_price_display',)
 
@@ -60,7 +60,7 @@ class FoodItemInline(admin.TabularInline):
 
 class RawItemInline(admin.TabularInline):
     model = RawItem
-    extra = 1
+    extra = 0
     fields = ('raw_material', 'quantity', 'price', 'total_item_price_display')
     readonly_fields = ('total_item_price_display',)
 
