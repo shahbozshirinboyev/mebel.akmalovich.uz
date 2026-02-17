@@ -2,6 +2,23 @@
 document.addEventListener('DOMContentLoaded', function() {
     console.log('1. DOM yuklandi');
 
+    // Barcha total maydonlarini boshlang'ich holatda readonly qilish
+    function makeAllTotalFieldsReadonly() {
+        // Standalone form total field
+        const standaloneTotal = document.querySelector('#id_total, input[name="total"]');
+        if (standaloneTotal) {
+            standaloneTotal.readOnly = true;
+        }
+
+        // Inline qatorlardagi total maydonlar
+        const allTotalInputs = document.querySelectorAll('input[name*="-total"]');
+        allTotalInputs.forEach(input => {
+            input.readOnly = true;
+        });
+    }
+
+    makeAllTotalFieldsReadonly();
+
     function updateTotalPrice() {
         // Barcha inline qatorlardagi total larni yig'ish
         const inlineRows1 = document.querySelectorAll('.dynamic-saleitem_set tbody tr');
@@ -61,6 +78,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const total = document.querySelector('#id_total, input[name="total"]');
             if (total) {
                 total.value = natija;
+                total.readOnly = true; // Make it readonly
                 // Trigger formatting for the total field
                 total.dispatchEvent(new Event('input'));
                 console.log('7. Total maydoni yangilandi:', natija);
@@ -118,6 +136,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     const p = parseFloat(pStr) || 0;
                     const natija = (q * p).toFixed(2);
                     totalInput.value = natija;
+                    totalInput.readOnly = true; // Make it readonly
                     console.log(`Inline ${index} total updated:`, natija);
 
                     // Trigger formatting for the total field
