@@ -63,17 +63,17 @@ class SaleAdmin(admin.ModelAdmin):
 
 # ----------------------------------------------------------------------
 
-# @admin.register(SaleItem)
-# class SaleItemAdmin(admin.ModelAdmin):
-# 	list_display = ("product", "quantity", "price", "total", "buyer", "sale", "created_at" )
-# 	# readonly_fields = ("total",)
+@admin.register(SaleItem)
+class SaleItemAdmin(admin.ModelAdmin):
+	list_display = ("product", "quantity", "price", "total", "buyer", "sale", "created_at" )
+	# readonly_fields = ("total",)
 
-# 	formfield_overrides = {
-# 		dj_models.DecimalField: {'widget': TextInput(attrs={'class': 'thousand-sep'})},
-# 	}
+	formfield_overrides = {
+		dj_models.DecimalField: {'widget': TextInput(attrs={'class': 'thousand-sep'})},
+	}
 
-# 	class Media:
-# 		js = ('sales/js/calculate_total.js', 'sales/js/decimal_thousands.js',)
+	class Media:
+		js = ('sales/js/calculate_total.js', 'sales/js/decimal_thousands.js',)
 
 # ----------------------------------------------------------------------
 
