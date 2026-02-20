@@ -54,6 +54,7 @@ class SalaryItem(models.Model):
 		verbose_name = "Элемент зарплаты"
 		verbose_name_plural = "Элементы зарплаты"
 		ordering = ["-salary__date", "created_at"]
+		unique_together = ("salary", "employee")
 
 	def __str__(self):
-		return f"{self.employee}"
+		return f"{self.employee} - {self.salary.date}"
