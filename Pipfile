@@ -8,6 +8,7 @@ waitress = "*"
 python-dotenv = "*"
 whitenoise = "*"
 psycopg = {extras = ["binary"], version = "*"}
+django = "*"
 
 [dev-packages]
 
