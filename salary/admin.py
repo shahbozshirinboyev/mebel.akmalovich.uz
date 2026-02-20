@@ -4,16 +4,23 @@ from django.http import JsonResponse
 from django.urls import path
 from django.forms import TextInput, Textarea
 from django.db import models as dj_models
-from .models import Employee, Salary
+from .models import Employee, Salary, SalaryItem
 
 User = get_user_model()
+
+
+class SalaryItemInline(admin.TabularInline):
+	model = SalaryItem
+	extra = 1
+	fields = ('employee', 'earned_amount', 'earned_note', 'paid_amount', 'paid_note')
+	formfield_overrides = {
+		dj_models.DecimalField: {'widget': TextInput(attrs={'class': 'thousand-sep'})},
+	}
 
 
 @admin.register(Employee)
 class EmployeeAdmin(admin.ModelAdmin):
 	list_display = ("full_name", "user", "phone_number", "position", "salary_type", "base_salary", "created_at")
-	list_filter = ()
-	search_fields = ()
 
 	formfield_overrides = {
 		dj_models.DecimalField: {'widget': TextInput(attrs={'class': 'thousand-sep'})},
@@ -57,15 +64,26 @@ class EmployeeAdmin(admin.ModelAdmin):
 		except User.DoesNotExist:
 			return JsonResponse({'error': 'User not found'}, status=404)
 
-@admin.register(Salary)
-class SalaryAdmin(admin.ModelAdmin):
-	list_display = ("employee", "date", "earned_amount", "earned_note", "paid_amount", "paid_note", "created_at")
-	list_filter = ()
-	search_fields = ()
+
+@admin.register(SalaryItem)
+class SalaryItemAdmin(admin.ModelAdmin):
+	list_display = ("salary", "employee", "earned_amount", "paid_amount", "created_at")
 
 	formfield_overrides = {
 		dj_models.DecimalField: {'widget': TextInput(attrs={'class': 'thousand-sep'})},
-		dj_models.TextField: {'widget': Textarea(attrs={'cols': 100, 'rows': 4})},
+	}
+
+	class Media:
+		js = ("salary/js/decimal_thousands.js",)
+
+
+@admin.register(Salary)
+class SalaryAdmin(admin.ModelAdmin):
+	list_display = ("employee", "date", "total_earned_salary", "total_paid_salary", "created_at")
+	inlines = [SalaryItemInline]
+
+	formfield_overrides = {
+		dj_models.DecimalField: {'widget': TextInput(attrs={'class': 'thousand-sep'})},
 	}
 
 	class Media:

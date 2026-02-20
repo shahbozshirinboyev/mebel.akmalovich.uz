@@ -16,6 +16,8 @@ class Employee(models.Model):
 	created_at = models.DateTimeField(auto_now_add=True)
 
 	class Meta:
+		verbose_name = "Работник"
+		verbose_name_plural = "Работники"
 		ordering = ["created_at"]
 
 	def __str__(self):
@@ -26,15 +28,34 @@ class Salary(models.Model):
 	id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 	employee = models.ForeignKey("Employee", on_delete=models.CASCADE, related_name="salaries")
 	date = models.DateField()
-	earned_amount = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
-	earned_note = models.TextField(blank=True, null=True)
-	paid_amount = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
-	paid_note = models.TextField(blank=True, null=True)
+	total_earned_salary = models.DecimalField(max_digits=20, decimal_places=2, default=0)
+	total_paid_salary = models.DecimalField(max_digits=20, decimal_places=2, default=0)
 	created_at = models.DateTimeField(auto_now_add=True)
 
 	class Meta:
+		verbose_name = "Зарплата"
+		verbose_name_plural = "Зарплаты"
 		ordering = ["-date", "-created_at"]
 		unique_together = ("employee", "date")
 
 	def __str__(self):
 		return f"Salary({self.employee}, {self.date})"
+
+
+class SalaryItem(models.Model):
+	id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+	salary = models.ForeignKey("Salary", on_delete=models.CASCADE, related_name="salary_items")
+	employee = models.ForeignKey("Employee", on_delete=models.CASCADE, related_name="salary_items")
+	earned_amount = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
+	earned_note = models.CharField(max_length=255, blank=True, null=True)
+	paid_amount = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
+	paid_note = models.CharField(max_length=255, blank=True, null=True)
+	created_at = models.DateTimeField(auto_now_add=True)
+
+	class Meta:
+		verbose_name = "Элемент зарплаты"
+		verbose_name_plural = "Элементы зарплаты"
+		ordering = ["-salary__date", "created_at"]
+
+	def __str__(self):
+		return f"SalaryItem({self.employee}, {self.earned_amount}, {self.paid_amount})"
