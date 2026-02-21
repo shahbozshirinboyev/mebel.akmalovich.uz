@@ -31,13 +31,13 @@ class Salary(models.Model):
 	created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
 
 	class Meta:
-		verbose_name = "Зарплата"
-		verbose_name_plural = "Зарплаты"
+		verbose_name = "Oylik maosh"
+		verbose_name_plural = "Oylik maoshlar"
 		ordering = ["-date", "-created_at"]
 		unique_together = ("created_by", "date")
 
 	def __str__(self):
-		return f"Зарплата - {self.date}"
+		return f"Oylik maosh - {self.date}"
 
 	def save(self, *args, **kwargs):
 		# First save the Salary instance
