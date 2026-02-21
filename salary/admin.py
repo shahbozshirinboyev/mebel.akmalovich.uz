@@ -74,7 +74,7 @@ class SalaryItemAdmin(admin.ModelAdmin):
 	}
 
 	class Media:
-		js = ("salary/js/decimal_thousands.js",)
+		js = ('salary/js/calculate_salary_total.js', 'salary/js/decimal_thousands.js',)
 
 
 @admin.register(Salary)
@@ -93,4 +93,4 @@ class SalaryAdmin(admin.ModelAdmin):
 		super().save_model(request, obj, form, change)
 
 	class Media:
-		js = ("salary/js/decimal_thousands.js",)
+		js = ('salary/js/calculate_salary_total.js', 'salary/js/decimal_thousands.js',)

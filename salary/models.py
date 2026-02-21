@@ -39,6 +39,25 @@ class Salary(models.Model):
 	def __str__(self):
 		return f"Зарплата - {self.date}"
 
+	def save(self, *args, **kwargs):
+		# First save the Salary instance
+		super().save(*args, **kwargs)
+
+		# Calculate totals from related SalaryItems
+		total_earned = self.salary_items.aggregate(
+			total=models.Sum('earned_amount')
+		)['total'] or 0
+		
+		total_paid = self.salary_items.aggregate(
+			total=models.Sum('paid_amount')
+		)['total'] or 0
+
+		# Update totals if different
+		if self.total_earned_salary != total_earned or self.total_paid_salary != total_paid:
+			self.total_earned_salary = total_earned
+			self.total_paid_salary = total_paid
+			super().save(update_fields=['total_earned_salary', 'total_paid_salary'])
+
 
 class SalaryItem(models.Model):
 	id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -58,3 +77,10 @@ class SalaryItem(models.Model):
 
 	def __str__(self):
 		return f"{self.employee} - {self.salary.date}"
+
+	def save(self, *args, **kwargs):
+		super().save(*args, **kwargs)
+		
+		# Update the parent Salary's totals after saving SalaryItem
+		if self.salary:
+			self.salary.save()
