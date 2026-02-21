@@ -68,6 +68,16 @@
             calculateTotal();
         });
 
+        // Delete event listeners for inline rows
+        $(document).on('change', 'input[name*="-DELETE"]', function() {
+            setTimeout(calculateTotal, 50);
+        });
+
+        // Delete link listeners
+        $(document).on('click', '.inline-deletelink', function() {
+            setTimeout(calculateTotal, 100);
+        });
+
         // Initial calculation
         calculateTotal();
 

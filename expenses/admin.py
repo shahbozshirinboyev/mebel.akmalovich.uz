@@ -25,6 +25,13 @@ class FoodItemAdmin(admin.ModelAdmin):
 		dj_models.DecimalField: {'widget': TextInput(attrs={'class': 'thousand-sep'})},
 	}
 
+	def save_model(self, request, obj, form, change):
+		super().save_model(request, obj, form, change)
+		
+		# FoodItem saqlangandan keyin tegishli Expenses ning total_cost ni yangilash
+		if obj.expense:
+			obj.expense.update_total_cost()
+
 	class Media:
 		js = ('expenses/js/calculate_total.js', 'expenses/js/decimal_thousands.js',)
 
@@ -37,11 +44,17 @@ class RawItemAdmin(admin.ModelAdmin):
 		dj_models.DecimalField: {'widget': TextInput(attrs={'class': 'thousand-sep'})},
 	}
 
+	def save_model(self, request, obj, form, change):
+		super().save_model(request, obj, form, change)
+		
+		# RawItem saqlangandan keyin tegishli Expenses ning total_cost ni yangilash
+		if obj.expense:
+			obj.expense.update_total_cost()
+
 	class Media:
 		js = ('expenses/js/calculate_total.js', 'expenses/js/decimal_thousands.js',)
 
 # ----------------------------------------------------------------------
-
 # --- Inlines: Expenses ichida ko'rinadigan qismlar ---
 
 class FoodItemInline(admin.TabularInline):
@@ -104,7 +117,19 @@ class ExpensesAdmin(admin.ModelAdmin):
         Inline mahsulotlar saqlangandan so'ng Expenses'ning total_cost'ini
         avtomatik qayta hisoblash uchun ushbu metoddan foydalanamiz.
         """
-        instances = formset.save()
+        instances = formset.save(commit=False)
+        deleted_instances = formset.deleted_objects
+        
+        # O'chirilgan itemlarni saqlash
+        for obj in deleted_instances:
+            obj.delete()
+        
+        # Yangi va o'zgartirilgan itemlarni saqlash
+        for instance in instances:
+            instance.save()
+        
+        formset.save_m2m()
+        
         # Asosiy Expense obyektini yangilash
         form.instance.update_total_cost()
         return instances
