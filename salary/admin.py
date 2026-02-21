@@ -87,6 +87,29 @@ class SalaryAdmin(admin.ModelAdmin):
 		dj_models.DecimalField: {'widget': TextInput(attrs={'class': 'thousand-sep'})},
 	}
 
+	def save_formset(self, request, form, formset, change):
+		instances = formset.save(commit=False)
+		deleted_instances = formset.deleted_objects
+		
+		# O'chirilgan itemlarni saqlash
+		for obj in deleted_instances:
+			obj.delete()
+		
+		# Yangi va o'zgartirilgan itemlarni saqlash
+		for instance in instances:
+			if hasattr(instance, 'salary') and instance.salary:
+				instance.save()
+		
+		# Saqlangandan keyin total larni qayta hisoblash
+		if form.instance and hasattr(form.instance, 'salary_items'):
+			total_earned = sum(item.earned_amount or 0 for item in form.instance.salary_items.all())
+			total_paid = sum(item.paid_amount or 0 for item in form.instance.salary_items.all())
+			form.instance.total_earned_salary = total_earned
+			form.instance.total_paid_salary = total_paid
+			form.instance.save(update_fields=['total_earned_salary', 'total_paid_salary'])
+		
+		formset.save_m2m()
+
 	def save_model(self, request, obj, form, change):
 		if not obj.pk:  # Only set created_by on creation
 			obj.created_by = request.user

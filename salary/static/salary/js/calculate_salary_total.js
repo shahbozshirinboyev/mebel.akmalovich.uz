@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    makeAllTotalFieldsReadonly();
+    // Boshlang'ich readonly qilishni keyinroq qilamiz, chunki avval hisoblash kerak
 
     function updateSalaryTotals() {
         console.log('Updating salary totals...');
@@ -90,24 +90,45 @@ document.addEventListener('DOMContentLoaded', function() {
         const totalPaidField = document.querySelector('#id_total_paid_salary, input[name="total_paid_salary"]');
 
         if (totalEarnedField) {
+            // Avval readonly ni olib tashlaymiz
+            const wasReadonly = totalEarnedField.readOnly;
+            totalEarnedField.readOnly = false;
+            
+            // Qiymatni o'rnatamiz
             totalEarnedField.value = totalEarned.toFixed(2);
-            totalEarnedField.readOnly = true; // Make it readonly
+            console.log('Total earned field set to:', totalEarned.toFixed(2));
+            
             // Trigger formatting for the total field
             totalEarnedField.dispatchEvent(new Event('input'));
-            console.log('Total earned field updated:', totalEarned.toFixed(2));
+            
+            // Qayta readonly qilamiz
+            totalEarnedField.readOnly = true;
+            console.log('Total earned field updated and made readonly');
         } else {
             console.log('Total earned field not found');
         }
 
         if (totalPaidField) {
+            // Avval readonly ni olib tashlaymiz
+            const wasReadonly = totalPaidField.readOnly;
+            totalPaidField.readOnly = false;
+            
+            // Qiymatni o'rnatamiz
             totalPaidField.value = totalPaid.toFixed(2);
-            totalPaidField.readOnly = true; // Make it readonly
+            console.log('Total paid field set to:', totalPaid.toFixed(2));
+            
             // Trigger formatting for the total field
             totalPaidField.dispatchEvent(new Event('input'));
-            console.log('Total paid field updated:', totalPaid.toFixed(2));
+            
+            // Qayta readonly qilamiz
+            totalPaidField.readOnly = true;
+            console.log('Total paid field updated and made readonly');
         } else {
             console.log('Total paid field not found');
         }
+        
+        // Oxirida readonly qilish
+        makeAllTotalFieldsReadonly();
     }
 
     // Dastlabki hisoblash
@@ -151,7 +172,43 @@ document.addEventListener('DOMContentLoaded', function() {
 
     setupInlineRows();
 
-    // Dinamik qo'shiladigan qatorlar uchun kuzatuv
+    // Django admin delete tugmalarini kuzatish
+    function setupDeleteListeners() {
+        console.log('Setting up delete listeners');
+        
+        // Delete checkbox lar va delete tugmalarini kuzatish
+        const deleteCheckboxes = document.querySelectorAll('input[name*="-DELETE"]');
+        const deleteLinks = document.querySelectorAll('a.inline-deletelink');
+        
+        console.log('Found delete checkboxes:', deleteCheckboxes.length);
+        console.log('Found delete links:', deleteLinks.length);
+        
+        // Delete checkbox lar uchun
+        deleteCheckboxes.forEach(function(checkbox) {
+            checkbox.addEventListener('change', function() {
+                console.log('Delete checkbox changed:', checkbox.checked);
+                setTimeout(function() {
+                    updateSalaryTotals();
+                }, 50);
+            });
+        });
+        
+        // Delete linklar uchun
+        deleteLinks.forEach(function(link) {
+            link.addEventListener('click', function(e) {
+                console.log('Delete link clicked');
+                // Link bosilganda DOM o'zgarishini MutationObserver tutadi
+                setTimeout(function() {
+                    updateSalaryTotals();
+                }, 100);
+            });
+        });
+    }
+
+    // Dastlabki delete listenerlarni o'rnatish
+    setupDeleteListeners();
+
+    // Dinamik qo'shiladigan va o'chiriladigan qatorlar uchun kuzatuv
     const observer = new MutationObserver(function(mutations) {
         mutations.forEach(function(mutation) {
             if (mutation.addedNodes.length) {
@@ -163,6 +220,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             setTimeout(function() {
                                 makeAllTotalFieldsReadonly();
                                 setupInlineRows();
+                                setupDeleteListeners();
                                 updateSalaryTotals();
                             }, 100);
                         }
@@ -171,6 +229,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             setTimeout(function() {
                                 makeAllTotalFieldsReadonly();
                                 setupInlineRows();
+                                setupDeleteListeners();
                                 updateSalaryTotals();
                             }, 100);
                         }
@@ -179,6 +238,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             setTimeout(function() {
                                 makeAllTotalFieldsReadonly();
                                 setupInlineRows();
+                                setupDeleteListeners();
                                 updateSalaryTotals();
                             }, 100);
                         }
@@ -192,6 +252,33 @@ document.addEventListener('DOMContentLoaded', function() {
                                     updateSalaryTotals();
                                 }, 100);
                             }
+                        }
+                    }
+                });
+            }
+            
+            // O'chirilgan qatorlarni kuzatish
+            if (mutation.removedNodes.length) {
+                mutation.removedNodes.forEach(function(node) {
+                    if (node.nodeType === Node.ELEMENT_NODE) {
+                        // Agar qator o'chirilgan bo'lsa
+                        if (node.tagName === 'TR' && node.querySelector('input[name*="-earned_amount"], input[name*="-paid_amount"]')) {
+                            console.log('Salary row deleted, updating totals');
+                            setTimeout(function() {
+                                makeAllTotalFieldsReadonly();
+                                setupInlineRows();
+                                setupDeleteListeners();
+                                updateSalaryTotals();
+                            }, 100);
+                        }
+                        else if (node.classList && node.classList.contains('dynamic-salaryitem_set')) {
+                            console.log('Salaryitem_set deleted, updating totals');
+                            setTimeout(function() {
+                                makeAllTotalFieldsReadonly();
+                                setupInlineRows();
+                                setupDeleteListeners();
+                                updateSalaryTotals();
+                            }, 100);
                         }
                     }
                 });
