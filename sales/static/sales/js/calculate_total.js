@@ -171,6 +171,42 @@ document.addEventListener('DOMContentLoaded', function() {
     // Dastlabki qatorlarni sozlash
     setupInlineRows();
 
+    // Django admin delete tugmalarini kuzatish
+    function setupDeleteListeners() {
+        console.log('Setting up delete listeners for sales');
+        
+        // Delete checkbox lar va delete tugmalarini kuzatish
+        const deleteCheckboxes = document.querySelectorAll('input[name*="-DELETE"]');
+        const deleteLinks = document.querySelectorAll('a.inline-deletelink');
+        
+        console.log('Found delete checkboxes:', deleteCheckboxes.length);
+        console.log('Found delete links:', deleteLinks.length);
+        
+        // Delete checkbox lar uchun
+        deleteCheckboxes.forEach(function(checkbox) {
+            checkbox.addEventListener('change', function() {
+                console.log('Delete checkbox changed:', checkbox.checked);
+                setTimeout(function() {
+                    updateTotalPrice();
+                }, 50);
+            });
+        });
+        
+        // Delete linklar uchun
+        deleteLinks.forEach(function(link) {
+            link.addEventListener('click', function(e) {
+                console.log('Delete link clicked');
+                // Link bosilganda DOM o'zgarishini MutationObserver tutadi
+                setTimeout(function() {
+                    updateTotalPrice();
+                }, 100);
+            });
+        });
+    }
+
+    // Dastlabki delete listenerlarni o'rnatish
+    setupDeleteListeners();
+
     // Dinamik qo'shiladigan qatorlar uchun kuzatuv
     const observer = new MutationObserver(function(mutations) {
         mutations.forEach(function(mutation) {
@@ -182,16 +218,19 @@ document.addEventListener('DOMContentLoaded', function() {
                         if (node.classList && node.classList.contains('dynamic-saleitem_set')) {
                             console.log('New saleitem_set detected');
                             setupInlineRows();
+                            setupDeleteListeners();
                         }
                         // Agar yangi tbody qo'shilgan bo'lsa
                         else if (node.tagName === 'TBODY') {
                             console.log('New tbody detected');
                             setupInlineRows();
+                            setupDeleteListeners();
                         }
                         // Agar yangi tr qo'shilgan bo'lsa
                         else if (node.tagName === 'TR' && node.querySelector('input[name*="-quantity"]')) {
                             console.log('New row detected');
                             setupInlineRows();
+                            setupDeleteListeners();
                         }
                         // Agar container ichida yangi qatorlar bo'lsa
                         else {
@@ -199,6 +238,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             if (rows.length > 0) {
                                 console.log('New container with rows detected');
                                 setupInlineRows();
+                                setupDeleteListeners();
                             }
                         }
                     }

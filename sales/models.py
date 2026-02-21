@@ -49,18 +49,9 @@ class Sale(models.Model):
 		return f"Sale - {self.date}"
 
 	def save(self, *args, **kwargs):
-		# First save the Sale instance
+		# Just save the Sale instance without automatic total calculation
+		# Total calculation will be handled by SaleAdmin.save_formset
 		super().save(*args, **kwargs)
-
-		# Calculate total from related SaleItems
-		total_sum = self.sotuvlar.aggregate(
-			total=models.Sum('total')
-		)['total'] or 0
-
-		# Update total_price if different
-		if self.total_price != total_sum:
-			self.total_price = total_sum
-			super().save(update_fields=['total_price'])
 
 
 class SaleItem(models.Model):
@@ -84,9 +75,8 @@ class SaleItem(models.Model):
 			self.total = 0
 		super().save(*args, **kwargs)
 
-		# Update the parent Sale's total_price after saving SaleItem
-		if self.sale:
-			self.sale.save()
+		# Don't call self.sale.save() here to avoid conflicts with save_formset
+		# The total_price will be updated by the SaleAdmin.save_formset method
 
 	def __str__(self):
 		if self.product:

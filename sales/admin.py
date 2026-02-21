@@ -40,8 +40,19 @@ class SaleAdmin(admin.ModelAdmin):
           super().save_model(request, obj, form, change)
 
       def save_formset(self, request, form, formset, change):
-          super().save_formset(request, form, formset, change)
-          # Recalculate total_price after saving Sale and all inline items (including deletions)
+          instances = formset.save(commit=False)
+          deleted_instances = formset.deleted_objects
+          
+          # O'chirilgan itemlarni saqlash
+          for obj in deleted_instances:
+              obj.delete()
+          
+          # Yangi va o'zgartirilgan itemlarni saqlash
+          for instance in instances:
+              if hasattr(instance, 'sale') and instance.sale:
+                  instance.save()
+          
+          # Saqlangandan keyin total_price ni qayta hisoblash
           obj = form.instance
           total_sum = obj.sotuvlar.aggregate(
               total=models.Sum('total')
@@ -49,6 +60,8 @@ class SaleAdmin(admin.ModelAdmin):
           if obj.total_price != total_sum:
               obj.total_price = total_sum
               obj.save(update_fields=['total_price'])
+          
+          formset.save_m2m()
 
       # total_price hisoblash
       def total_price(self, obj):
