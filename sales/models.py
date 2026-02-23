@@ -5,10 +5,10 @@ import uuid
 
 class Buyer(models.Model):
 	id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-	name = models.CharField(max_length=255)
-	sign = models.CharField(max_length=255, blank=True)
-	phone_number = models.CharField(max_length=50, blank=True)
-	created_at = models.DateTimeField(auto_now_add=True)
+	name = models.CharField(max_length=255, verbose_name="Ismi")
+	sign = models.CharField(max_length=255, blank=True, verbose_name="Belgisi")
+	phone_number = models.CharField(max_length=50, blank=True, verbose_name="Telefon raqami")
+	created_at = models.DateTimeField(auto_now_add=True, verbose_name="Yaratilgan sana")
 
 	class Meta:
 		verbose_name = "Xaridor "
@@ -21,9 +21,9 @@ class Buyer(models.Model):
 
 class Product(models.Model):
 	id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-	product_name = models.CharField(max_length=255)
-	measurement_unit = models.CharField(max_length=64, blank=True)
-	created_at = models.DateTimeField(auto_now_add=True)
+	product_name = models.CharField(max_length=255, verbose_name="Mahsulot nomi")
+	measurement_unit = models.CharField(max_length=64, blank=True, verbose_name="O'lchov birligi")
+	created_at = models.DateTimeField(auto_now_add=True, verbose_name="Yaratilgan sana")
 
 	class Meta:
 		verbose_name = "Mahsulot "
@@ -36,11 +36,11 @@ class Product(models.Model):
 
 class Sale(models.Model):
 	id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-	created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
-	date = models.DateField(unique=True)
-	description = models.TextField(blank=True)
-	total_price = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
-	created_at = models.DateTimeField(auto_now_add=True)
+	created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Yaratgan foydalanuvchi")
+	date = models.DateField(unique=True, verbose_name="Sana")
+	description = models.TextField(blank=True, verbose_name="Tavsif")
+	total_price = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True, verbose_name="Jami narx")
+	created_at = models.DateTimeField(auto_now_add=True, verbose_name="Yaratilgan sana")
 
 	class Meta:
 		ordering = ["-created_at"]
@@ -61,13 +61,13 @@ class Sale(models.Model):
 
 class SaleItem(models.Model):
 	id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-	sale = models.ForeignKey(Sale, on_delete=models.CASCADE, related_name="sotuvlar")
-	product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="sale_items")
-	quantity = models.DecimalField(max_digits=20, decimal_places=2, default=0)
-	price = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
-	total = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True, default=0)
-	buyer = models.ForeignKey(Buyer, on_delete=models.SET_NULL, null=True, blank=True)
-	created_at = models.DateTimeField(auto_now_add=True)
+	sale = models.ForeignKey(Sale, on_delete=models.CASCADE, related_name="sotuvlar", verbose_name="Savdo")
+	product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="sale_items", verbose_name="Mahsulot")
+	quantity = models.DecimalField(max_digits=20, decimal_places=2, default=0, verbose_name="Miqdor")
+	price = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True, verbose_name="Narx")
+	total = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True, default=0, verbose_name="Jami")
+	buyer = models.ForeignKey(Buyer, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Xaridor")
+	created_at = models.DateTimeField(auto_now_add=True, verbose_name="Yaratilgan sana")
 
 	class Meta:
 		verbose_name = "[ Savdo elementi ] "

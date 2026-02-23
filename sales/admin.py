@@ -9,7 +9,6 @@ class SaleItemInline(admin.TabularInline):
 	model = SaleItem
 	extra = 0
 	fields = ("product", "quantity", "price", "total", "buyer")
-	# readonly_fields = ("total",)
 
 	formfield_overrides = {
 		dj_models.DecimalField: {'widget': TextInput(attrs={'class': 'thousand-sep'})},
@@ -18,8 +17,9 @@ class SaleItemInline(admin.TabularInline):
 @admin.register(Sale)
 class SaleAdmin(admin.ModelAdmin):
       list_display = ("date", "created_by", "total_price", "description", "created_at")
+      list_filter = ()
+      search_fields = ()
       inlines = (SaleItemInline,)
-    #   readonly_fields = ("total_price",)
 
       formfield_overrides = {
 		dj_models.DecimalField: {'widget': TextInput(attrs={'class': 'thousand-sep'})},
@@ -113,7 +113,8 @@ class ProductAdmin(admin.ModelAdmin):
 	class Media:
 		js = ('sales/js/decimal_thousands.js',)
 
-
 @admin.register(Buyer)
 class BuyerAdmin(admin.ModelAdmin):
 	list_display = ("name", "sign", "phone_number", "created_at")
+	list_filter = ()
+	search_fields = ()

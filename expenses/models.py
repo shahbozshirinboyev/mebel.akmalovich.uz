@@ -7,9 +7,9 @@ import uuid
 # FoodProducts va RawMaterials alohida qolmoqda
 class FoodProducts(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    food_product_name = models.CharField(max_length=255)
-    measurement_unit = models.CharField(max_length=64, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+    food_product_name = models.CharField(max_length=255, verbose_name="Oziq-ovqat nomi")
+    measurement_unit = models.CharField(max_length=64, blank=True, verbose_name="O'lchov birligi")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Yaratilgan sana")
 
     class Meta:
         verbose_name = "Oziq-ovqat "
@@ -21,9 +21,9 @@ class FoodProducts(models.Model):
 
 class RawMaterials(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    raw_material_name = models.CharField(max_length=255)
-    measurement_unit = models.CharField(max_length=64, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+    raw_material_name = models.CharField(max_length=255, verbose_name="Xom-ashyo nomi")
+    measurement_unit = models.CharField(max_length=64, blank=True, verbose_name="O'lchov birligi")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Yaratilgan sana")
 
     class Meta:
         verbose_name = "Xom-ashyo "
@@ -35,15 +35,11 @@ class RawMaterials(models.Model):
 
 class Expenses(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
-    date = models.DateField(unique=True)
-
-    # ManyToMany olib tashlandi, chunki bog'liqlik
-    # FoodItem va RawItem modellaridagi ForeignKey orqali boshqariladi.
-
-    total_cost = models.DecimalField(max_digits=20, decimal_places=2, default=0, editable=False)
-    description = models.TextField(blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Yaratgan foydalanuvchi")
+    date = models.DateField(unique=True, verbose_name="Sana")
+    total_cost = models.DecimalField(max_digits=20, decimal_places=2, default=0, editable=False, verbose_name="Umumiy summa")
+    description = models.TextField(blank=True, verbose_name="Tavsif")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Yaratilgan sana")
 
     def clean(self):
         if self.date and Expenses.objects.filter(date=self.date).exclude(pk=self.pk).exists():
@@ -76,10 +72,10 @@ class Expenses(models.Model):
 class FoodItem(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     expense = models.ForeignKey(Expenses, on_delete=models.CASCADE, related_name="food_items")
-    food_product = models.ForeignKey(FoodProducts, on_delete=models.CASCADE)
-    quantity = models.DecimalField(max_digits=20, decimal_places=2, default=0)
-    price = models.DecimalField(max_digits=20, decimal_places=2, default=0) # Narx majburiy bo'lgani ma'qul
-    created_at = models.DateTimeField(auto_now_add=True)
+    food_product = models.ForeignKey(FoodProducts, on_delete=models.CASCADE, verbose_name="Oziq-ovqat nomi")
+    quantity = models.DecimalField(max_digits=20, decimal_places=2, default=0, verbose_name="Miqdori")
+    price = models.DecimalField(max_digits=20, decimal_places=2, default=0, verbose_name="Narxi") # Narx majburiy bo'lgani ma'qul
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Yaratilgan sana")
 
     class Meta:
         verbose_name = "[ Oziq-ovqat elementi ] "
@@ -96,10 +92,10 @@ class FoodItem(models.Model):
 class RawItem(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     expense = models.ForeignKey(Expenses, on_delete=models.CASCADE, related_name="raw_items")
-    raw_material = models.ForeignKey(RawMaterials, on_delete=models.CASCADE)
-    quantity = models.DecimalField(max_digits=20, decimal_places=2, default=0)
-    price = models.DecimalField(max_digits=20, decimal_places=2, default=0)
-    created_at = models.DateTimeField(auto_now_add=True)
+    raw_material = models.ForeignKey(RawMaterials, on_delete=models.CASCADE, verbose_name="Xom-ashyo nomi")
+    quantity = models.DecimalField(max_digits=20, decimal_places=2, default=0, verbose_name="Miqdori")
+    price = models.DecimalField(max_digits=20, decimal_places=2, default=0, verbose_name="Narxi")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Yaratilgan sana")
 
     class Meta:
         verbose_name = "[ Xom-ashyo elementi ] "
