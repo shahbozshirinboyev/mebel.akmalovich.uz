@@ -24,7 +24,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 ALLOWED_HOSTS = ['*']
-CSRF_TRUSTED_ORIGINS = ['https://weya.uz', 'https://www.weya.uz']
+CSRF_TRUSTED_ORIGINS = ["https://mebel.akmalovich.com", "https://www.mebel.akmalovich.com", "http://mebel.akmalovich.com", "http://www.mebel.akmalovich.com"]
 
 # Application definition
 INSTALLED_APPS = [
