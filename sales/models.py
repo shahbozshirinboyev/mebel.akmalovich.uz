@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models
+from django.core.exceptions import ValidationError
 import uuid
 
 
@@ -83,6 +84,12 @@ class SaleItem(models.Model):
     default=PaymentStatus.UNPAID,
     verbose_name="To'lov holati"
 		)
+	buyers_paid = models.DecimalField(
+		max_digits=20,
+		decimal_places=2,
+		default=0,
+		verbose_name="Xaridor to'lagan summa"
+	)
 
 	order_status = models.CharField(
     max_length=10,
@@ -97,11 +104,27 @@ class SaleItem(models.Model):
 		verbose_name = "[ Zakaz elementi ] "
 		verbose_name_plural = "[ Zakaz elementlari ] "
 
+	def clean(self):
+		total_value = self.total or 0
+		paid_value = self.buyers_paid or 0
+
+		if self.payment_status == self.PaymentStatus.UNPAID:
+			self.buyers_paid = 0
+		elif self.payment_status == self.PaymentStatus.PAID:
+			self.buyers_paid = total_value
+		elif self.payment_status == self.PaymentStatus.PARTIAL:
+			if paid_value <= 0:
+				raise ValidationError({"buyers_paid": "Qisman to'lov uchun summa 0 dan katta bo'lishi kerak."})
+			if total_value and paid_value >= total_value:
+				raise ValidationError({"buyers_paid": "Qisman to'lov jami summadan kichik bo'lishi kerak."})
+
 	def save(self, *args, **kwargs):
 		if self.quantity and self.price:
 			self.total = self.quantity * self.price
 		else:
 			self.total = 0
+
+		self.clean()
 		super().save(*args, **kwargs)
 
 		# Don't call self.sale.save() here to avoid conflicts with save_formset

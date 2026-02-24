@@ -8,7 +8,7 @@ from .models import Buyer, OpenSaleItem, Product, Sale, SaleItem, UnpaidSaleItem
 class SaleItemInline(admin.TabularInline):
 	model = SaleItem
 	extra = 0
-	fields = ("product", "quantity", "price", "total", "buyer", "payment_status", "order_status")
+	fields = ("product", "quantity", "price", "total", "buyer", "payment_status", "buyers_paid", "order_status")
 
 	formfield_overrides = {
 		dj_models.DecimalField: {'widget': TextInput(attrs={'class': 'thousand-sep'})},
@@ -27,7 +27,7 @@ class SaleAdmin(admin.ModelAdmin):
 	  }
 
       class Media:
-            js = ('sales/js/calculate_total.js', 'sales/js/decimal_thousands.js',)
+            js = ('sales/js/calculate_total.js', 'sales/js/payment_status_toggle.js', 'sales/js/decimal_thousands.js',)
 
       # ADD form ochilganda initial qiymat
       def get_changeform_initial_data(self, request):
@@ -78,7 +78,7 @@ class SaleAdmin(admin.ModelAdmin):
 
 @admin.register(SaleItem)
 class SaleItemAdmin(admin.ModelAdmin):
-	list_display = ("product", "quantity", "price", "total", "buyer", "sale", "created_at" )
+	list_display = ("product", "quantity", "price", "total", "buyer", "payment_status", "buyers_paid", "sale", "created_at" )
 	# readonly_fields = ("total",)
 
 	formfield_overrides = {
@@ -98,7 +98,7 @@ class SaleItemAdmin(admin.ModelAdmin):
 				obj.sale.save(update_fields=['total_price'])
 
 	class Media:
-		js = ('sales/js/calculate_total.js', 'sales/js/decimal_thousands.js',)
+		js = ('sales/js/calculate_total.js', 'sales/js/payment_status_toggle.js', 'sales/js/decimal_thousands.js',)
 
 # ----------------------------------------------------------------------
 
@@ -129,6 +129,7 @@ class BaseSaleItemReportAdmin(admin.ModelAdmin):
 		"price",
 		"total",
 		"payment_status",
+		"buyers_paid",
 		"order_status",
 		"created_at",
 	)
