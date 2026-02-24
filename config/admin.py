@@ -25,23 +25,23 @@ class OrderedAdminSite(AdminSite):
         },
         "expenses": {
             "Expenses": 10,
-            "FoodItem": 20,
-            "RawItem": 30,
-            "FoodProducts": 40,
-            "RawMaterials": 50,
+            "FoodProducts": 20,
+            "RawMaterials": 30,
+            "FoodItem": 40,
+            "RawItem": 50,
         },
         "salary": {
             "Salary": 10,
-            "SalaryItem": 20,
-            "Employee": 30,
+            "Employee": 20,
+            "SalaryItem": 30,
         },
     }
 
     # Non-superuserlar uchun admin ro'yxatida ko'rinmaydigan modellar.
     hidden_for_non_superusers = {
-        "sales": {"SaleItem"},
-        "expenses": {"FoodItem", "RawItem"},
-        "salary": {"SalaryItem"},
+        # "sales": {"SaleItem"},
+        # "expenses": {"FoodItem", "RawItem"},
+        # "salary": {"SalaryItem"},
     }
 
     def _is_hidden(self, request, app_label, object_name):
