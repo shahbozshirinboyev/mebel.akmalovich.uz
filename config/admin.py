@@ -35,10 +35,25 @@ class OrderedAdminSite(AdminSite):
         },
     }
 
+    # Non-superuserlar uchun admin ro'yxatida ko'rinmaydigan modellar.
+    hidden_for_non_superusers = {
+        "sales": {"SaleItem"},
+        "expenses": {"FoodItem", "RawItem"},
+        "salary": {"SalaryItem"},
+    }
+
+    def _is_hidden(self, request, app_label, object_name):
+        return object_name in self.hidden_for_non_superusers.get(app_label, set())
+
     def get_app_list(self, request, app_label=None):
         app_list = super().get_app_list(request, app_label=app_label)
 
         for app in app_list:
+            app["models"] = [
+                model
+                for model in app["models"]
+                if not self._is_hidden(request, app["app_label"], model["object_name"])
+            ]
             order_map = self.model_order.get(app["app_label"], {})
             app["models"].sort(
                 key=lambda model: (
@@ -47,6 +62,7 @@ class OrderedAdminSite(AdminSite):
                 )
             )
 
+        app_list = [app for app in app_list if app["models"]]
         app_list.sort(
             key=lambda app: (
                 self.app_order.get(app["app_label"], 999),
