@@ -111,3 +111,17 @@ class SaleItem(models.Model):
 		if self.product:
 			return self.product.product_name
 		return "Mahsulot tanlanmagan"
+
+
+class OpenSaleItem(SaleItem):
+	class Meta:
+		proxy = True
+		verbose_name = "Yopilmagan zakaz"
+		verbose_name_plural = "Yopilmagan zakazlar"
+
+
+class UnpaidSaleItem(SaleItem):
+	class Meta:
+		proxy = True
+		verbose_name = "To'lanmagan zakaz"
+		verbose_name_plural = "To'lanmagan zakazlar"

@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.db import models
 from django.forms import TextInput, Textarea
 from django.db import models as dj_models
-from .models import Buyer, Product, Sale, SaleItem
+from .models import Buyer, OpenSaleItem, Product, Sale, SaleItem, UnpaidSaleItem
 
 
 class SaleItemInline(admin.TabularInline):
@@ -118,3 +118,50 @@ class BuyerAdmin(admin.ModelAdmin):
 	list_display = ("name", "sign", "phone_number", "created_at")
 	list_filter = ()
 	search_fields = ()
+
+
+class BaseSaleItemReportAdmin(admin.ModelAdmin):
+	list_display = (
+		"sale",
+		"buyer",
+		"product",
+		"quantity",
+		"price",
+		"total",
+		"payment_status",
+		"order_status",
+		"created_at",
+	)
+	list_select_related = ("sale", "buyer", "product")
+	search_fields = ("buyer__name", "buyer__sign", "product__product_name", "sale__date")
+	ordering = ("-created_at",)
+
+	def has_add_permission(self, request):
+		return False
+
+	def has_delete_permission(self, request, obj=None):
+		return False
+
+
+@admin.register(OpenSaleItem)
+class OpenSaleItemAdmin(BaseSaleItemReportAdmin):
+	"""Admin bo'lim: yopilmagan zakazlar ro'yxati."""
+
+	def get_queryset(self, request):
+		return (
+			super()
+			.get_queryset(request)
+			.filter(order_status=SaleItem.OrderStatus.OPEN)
+		)
+
+
+@admin.register(UnpaidSaleItem)
+class UnpaidSaleItemAdmin(BaseSaleItemReportAdmin):
+	"""Admin bo'lim: to'liq to'lanmagan zakazlar ro'yxati."""
+
+	def get_queryset(self, request):
+		return (
+			super()
+			.get_queryset(request)
+			.exclude(payment_status=SaleItem.PaymentStatus.PAID)
+		)
