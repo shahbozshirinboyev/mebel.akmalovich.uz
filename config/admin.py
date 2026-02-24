@@ -1,0 +1,56 @@
+﻿from django.contrib.admin import AdminSite
+
+
+class OrderedAdminSite(AdminSite):
+    """Admin paneldagi app va model tartibini qo'lda boshqaradi."""
+
+    app_order = {
+        "users": 10,
+        "salary": 20,
+        "sales": 30,
+        "expenses": 40,
+    }
+
+    model_order = {
+        "users": {
+            "User": 10,
+        },
+        "sales": {
+            "Sale": 10,
+            "SaleItem": 20,
+            "Product": 30,
+            "Buyer": 40,
+        },
+        "expenses": {
+            "Expenses": 10,
+            "FoodItem": 20,
+            "RawItem": 30,
+            "FoodProducts": 40,
+            "RawMaterials": 50,
+        },
+        "salary": {
+            "Salary": 10,
+            "SalaryItem": 20,
+            "Employee": 30,
+        },
+    }
+
+    def get_app_list(self, request, app_label=None):
+        app_list = super().get_app_list(request, app_label=app_label)
+
+        for app in app_list:
+            order_map = self.model_order.get(app["app_label"], {})
+            app["models"].sort(
+                key=lambda model: (
+                    order_map.get(model["object_name"], 999),
+                    model["name"].lower(),
+                )
+            )
+
+        app_list.sort(
+            key=lambda app: (
+                self.app_order.get(app["app_label"], 999),
+                app["name"].lower(),
+            )
+        )
+        return app_list
