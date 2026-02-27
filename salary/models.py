@@ -31,13 +31,13 @@ class Salary(models.Model):
 	created_at = models.DateTimeField(auto_now_add=True, verbose_name="Yaratilgan sana")
 
 	class Meta:
-		verbose_name = "Kunlik maosh "
-		verbose_name_plural = "Kunlik maoshlar "
+		verbose_name = "Ish haqi "
+		verbose_name_plural = "Ish haqi "
 		ordering = ["-date", "-created_at"]
 		unique_together = ("created_by", "date")
 
 	def __str__(self):
-		return f"Kunlik maosh - {self.date}"
+		return f"Ish haqi - {self.date}"
 
 	def save(self, *args, **kwargs):
 		super().save(*args, **kwargs)
@@ -67,8 +67,8 @@ class SalaryItem(models.Model):
 	created_at = models.DateTimeField(auto_now_add=True, verbose_name="Yaratilgan sana")
 
 	class Meta:
-		verbose_name = "[ Kunlik maosh elementi ] "
-		verbose_name_plural = "[ Kunlik maosh elementlari ] "
+		verbose_name = "Ishch ish haqi "
+		verbose_name_plural = "Ishchilar ish haqi "
 		ordering = ["-salary__date", "created_at"]
 		unique_together = ("salary", "employee")
 
